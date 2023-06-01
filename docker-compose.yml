@@ -8,28 +8,47 @@ services:
     volumes:
       - ./app:/var/www/html
       - ./config/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - mongodb
 
   php-fpm:
-    image: php8.2-fpm-mongo
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile_PHP
     volumes:
       - ./app:/var/www/html
     environment:
-      DB_USERNAME: root
-      DB_PASSWORD: secret
+      DB_USERNAME: ${MONGO_ROOT_USERNAME}
+      DB_PASSWORD: ${MONGO_ROOT_PASSWORD}
       DB_HOST: mongodb # matches the service with mongodb
+    depends_on:
+      - mongodb
 
   mongodb:
     image: "percona/percona-server-mongodb:6.0.4"
+    hostname: mongodb
     # image: "percona/percona-server-mongodb:6.0.4-3-arm64" # For Apple M1/M2
-    volumes:
-      - ./data:/data/db
-      - ./config/usersdb.json:/tmp/usersdb.json
+    #volumes:
+    #  - ./data:/data/db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: secret
-      MONGO_INITDB_DATABASE: tutorial
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DEFAULT_DATABASE}
     ports: 
       - "27017:27017"
-    command: mongoimport -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --db nosqlinj --collection users --host localhost:27017 --authenticationDatabase admin --jsonArray /tmp/usersdb.json
+
+  mongoseed:
+    image: "percona/percona-server-mongodb:6.0.4"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    volumes:
+      - ./config/usersdb.json:/tmp/usersdb.json
+      - ./config/mongo_import.sh:/tmp/mongo_import.sh
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    command: sh -c /tmp/mongo_import.sh
+

@@ -1,11 +1,15 @@
 FROM php:8.2-fpm
 
 RUN apt-get -y update \
-    && apt-get install -y libssl-dev pkg-config libzip-dev unzip git
+    && apt-get install -y libssl-dev pkg-config libzip-dev unzip git wget
 
 RUN pecl install zlib zip mongodb \
     && docker-php-ext-enable zip \
     && docker-php-ext-enable mongodb
 
 # Install composer (updated via entry point)
+COPY ./app/* /var/www/html/
+RUN ls -al /var/www/html
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install
+

@@ -12,35 +12,17 @@ That's it! However, it's a good starting point to do something more.
 
 1. Clone the repository and navigate to the project folder.
 
-2. Run Image build from Dockerfile
-
-```
-docker build -t php8.2-fpm-mongo .
-```
-
-3. Run docker-compose
+2. Run docker-compose
 
 ```
 docker-compose up -d
 ```
 
-4. Connect to a container with PHP-fpm
+3. Open localhost in your browser
 
-```
-docker exec -it [php-fpm-container-name] bash
-```
+4. Enjoy modifying the index.php script and checking the result by simply reloading the localhost page in your browser
 
-5. Install the Composer packages needed for the application (composer.json)
-
-```
-composer install
-```
-
-6. Open localhost in your browser
-
-7. Enjoy modifying the index.php script and checking the result by simply reloading the localhost page in your browser
-
-8. Stop docker-compose after experimenting
+5. Stop docker-compose after experimenting
 
 ```
 docker-compose down

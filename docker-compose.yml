@@ -11,6 +11,7 @@ services:
 
   php-fpm:
     image: php8.2-fpm-mongo
+    build: .
     volumes:
       - ./app:/var/www/html
     environment:
@@ -23,6 +24,7 @@ services:
     # image: "percona/percona-server-mongodb:6.0.4-3-arm64" # For Apple M1/M2
     volumes:
       - ./data:/data/db
+      - ./config/usersdb.json:/tmp/usersdb.json
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -30,3 +32,4 @@ services:
       MONGO_INITDB_DATABASE: tutorial
     ports: 
       - "27017:27017"
+    command: mongoimport -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --db nosqlinj --collection users --host localhost:27017 --authenticationDatabase admin --jsonArray /tmp/usersdb.json

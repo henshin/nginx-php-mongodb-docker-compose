@@ -50,5 +50,5 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    command: sh -c /tmp/mongo_import.sh
+    command: sh /tmp/mongo_import.sh
 
